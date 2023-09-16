@@ -6,6 +6,9 @@ var vPosition;
 var rColor;
 
 var stop = false;
+var going_where = "UP";
+var points = 0;
+var pointsText;
 
 // variables for the enemies
 var enemy1_pos;
@@ -42,9 +45,11 @@ var enemy5_buffer;
 
 var street_color = vec4(0.0, 0.0, 0.0, 1.0);
 var frog_color = vec4(0.0, 1.0, 0.0, 1.0);
+var street_pos;
 
 window.onload = function init() {
     var canvas = document.getElementById("gameCanvas");
+    pointsText = document.getElementById("points");
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -109,6 +114,7 @@ window.onload = function init() {
 
 
     frog_pos = frog_vertices;
+    street_pos = street_vertices;
     enemy1_pos = enemy1_vertices;
     enemy2_pos = enemy2_vertices;
     enemy3_pos = enemy3_vertices;
@@ -283,6 +289,23 @@ function handleMovement(event) {
         default:
             break;
     }
+    get_point();
+}
+
+function get_point() {
+    console.log("points: ", points);
+    if (going_where === "UP") {
+       if (frog_pos[0][1] >= street_pos[0][1]) {
+            points += 1;
+            going_where = "DOWN";
+       }  
+    } else {
+        if (frog_pos[1][1] < street_pos[2][1]) {
+            points += 1;
+            going_where = "UP";
+        }
+    }
+    pointsText.innerHTML = points;
 }
 
 function flip() {
@@ -343,6 +366,10 @@ function restartGame(event) {
     if (event.key === "Enter" && stop) {
         // Reset the game state
         stop = false;
+        points = 0;
+        pointsText.innerHTML = points;
+        going_where = "UP";
+        pointsText = document.getElementById("points");
         frog_cur_dir = "UP";
         enemy1_speed = Math.random() * 0.02 + 0.01;
         enemy2_speed = Math.random() * 0.02 + 0.01;
